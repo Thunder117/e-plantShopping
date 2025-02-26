@@ -7,22 +7,26 @@ const CartItem = ({ onContinueShopping }) => {
   const cart = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
 
+  // Calculate total amount for all products in the cart
   const calculateTotalAmount = () => {
-    let total = 0;
-    cart.forEach(item => {
-      total += parseFloat(item.cost.substring(1)) * item.quantity;
-    });
-    return total.toFixed(2);
+    return cart.reduce((total, item) => {
+      return total + item.quantity * parseFloat(item.cost.substring(1));
+    }, 0).toFixed(2);
   };
 
-  const calculateTotalCost = (item) => {
-    return (parseFloat(item.cost.substring(1)) * item.quantity).toFixed(2);
+  // Handle continue shopping
+  const handleContinueShopping = (e) => {
+    if (onContinueShopping) {
+      onContinueShopping(e);
+    }
   };
 
+  // Increment item quantity
   const handleIncrement = (item) => {
     dispatch(updateQuantity({ name: item.name, quantity: item.quantity + 1 }));
   };
 
+  // Decrement item quantity or remove if zero
   const handleDecrement = (item) => {
     if (item.quantity > 1) {
       dispatch(updateQuantity({ name: item.name, quantity: item.quantity - 1 }));
@@ -31,12 +35,14 @@ const CartItem = ({ onContinueShopping }) => {
     }
   };
 
+  // Remove item from cart
   const handleRemove = (item) => {
     dispatch(removeItem(item.name));
   };
 
-  const handleContinueShopping = (e) => {
-    onContinueShopping(e);
+  // Calculate total cost for an item
+  const calculateTotalCost = (item) => {
+    return (item.quantity * parseFloat(item.cost.substring(1))).toFixed(2);
   };
 
   return (
@@ -62,7 +68,7 @@ const CartItem = ({ onContinueShopping }) => {
       </div>
       <div style={{ marginTop: '20px', color: 'black' }} className='total_cart_amount'></div>
       <div className="continue_shopping_btn">
-        <button className="get-started-button" onClick={handleContinueShopping}>Continue Shopping</button>
+        <button className="get-started-button" onClick={(e) => handleContinueShopping(e)}>Continue Shopping</button>
         <br />
         <button className="get-started-button1" onClick={() => alert('Functionality to be added for future reference')}>Checkout</button>
       </div>
